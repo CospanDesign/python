@@ -17,10 +17,17 @@
 
 
 import sys
+import json
 import os
 import argparse
+import zipfile
+import tempfile
+import shutil
+from cookielib import CookieJar
+import urllib
+from urllib2 import build_opener, HTTPCookieProcessor
 
-#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+path = os.path.abspath(os.path.curdir)
 
 NAME = os.path.basename(os.path.realpath(__file__))
 
@@ -36,7 +43,19 @@ EPILOG = "\n" \
 
 debug = False
 
-GITHUB_REPO_URL_FILE = "github_repo_url.txt"
+REPO_CONFIG_FILE = "repo_raw_config.json"
+
+def get_repo_zip_file(url, dest_path):
+    print "Getting URL: %s" % url
+    tempdir = tempfile.mkdtemp()
+    temparchive = os.path.join(tempdir, "archive.zip")
+    print "Temp path:%s" % temparchive
+    urllib.urlretrieve(url, temparchive)
+    zf = zipfile.ZipFile(temparchive, "a")
+    zf.extractall(dest_path)
+    zf.close()
+    shutil.rmtree(tempdir)
+
 
 def main(argv):
     #Parse out the commandline arguments
@@ -54,19 +73,43 @@ def main(argv):
                         type = str,
                         nargs = '?',
                         default = None,
-                        help="Specify the URL, if left blank, the script will attempt to read the URL from a file in the same directory with the name: %s" % GITHUB_REPO_URL_FILE)
+                        help="Specify the URL, if left blank, the script will attempt to read the URL from a file in the same directory with the name: %s" % REPO_CONFIG_FILE)
+    parser.add_argument("-o", "--output",
+                        type = str,
+                        nargs = 1,
+                        default = path,
+                        help = "Specify the output path, if not the current directory will be the path")
 
     args = parser.parse_args()
     url_path = None
+    dest_path = None
 
     try:
-        f = open (GITHUB_REPO_URL_FILE, "r")
-        url_path = f.read().strip()
-        print "Found URL Path in configuration file: %s" % url_path
+        f = open (REPO_CONFIG_FILE, "r")
+        config_data = json.load(f)
+        url_path = config_data["url"]
+        dest_path = os.path.abspath(config_data["output"])
     except IOError as err:
         pass
+        
+    if url_path is None:
+        if args.url is None:
+            print "Error: URL Path was not found in %s and was not specified on command line" % REPO_CONFIG_FILE
+            sys.exit(1)
+        else:
+            url_path = args.url
 
-    print "Running Script: %s" % NAME
+    if dest_path is None:
+        if args.output is None:
+            print "Error: Destination path cannot be None"
+        else:
+            dest_path = args.output
+
+    if args.debug:
+        print "URL Path: %s" % url_path
+        print "Output: %s" % dest_path
+    else:
+        get_repo_zip_file(url_path, dest_path)
 
 
 if __name__ == "__main__":
