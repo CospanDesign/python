@@ -1,0 +1,7 @@
+<msg type="warning" file="HDLCompiler" num="1127" delta="old" >"/home/cospan/projects/ibuilder_project/rtl/bus/interface/ft_master_interface.v" Line 142: Assignment to <arg fmt="%s" index="1">out_d</arg> ignored, since the identifier is never used
+</msg>
+
+<msg type="warning" file="HDLCompiler" num="1016" delta="old" >"/home/cospan/projects/ibuilder_project/rtl/dependencies/ft_fifo_interface.v" Line 177: Port <arg fmt="%s" index="1">inactive</arg> is not connected to this instance
+</msg>
+
+

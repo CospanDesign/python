@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT: This is an internal file that has been generated
+     by the Xilinx ISE software.  Any direct editing or
+     changes made to this file may result in unpredictable
+     behavior or data corruption.  It is strongly advised that
+     users do not edit the contents of this file. -->
+<messages>
+<msg type="warning" file="Bitgen" num="301" delta="old" >The ExtMasterCclk_divide:<arg fmt="%s" index="1">1</arg> setting will be ignored because the ExtMasterCclk_en option has been set to No.
+</msg>
+
+<msg type="info" file="Bitgen" num="341" delta="old" >This design is using one or more 9K Block RAMs (RAMB8BWER).  9K Block RAM initialization data, both user defined and default, requires a special bit stream format.  For more information, please reference Xilinx Answer Record 39999.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="372" delta="old" >Gated clock. Clock net <arg fmt="%s" index="1">mem1/ram/ppfifo_rd/fifo1/status_G</arg> is sourced by a combinatorial pin. This is not good design practice. Use the CE pin to control the loading of data into the flip-flop.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="372" delta="old" >Gated clock. Clock net <arg fmt="%s" index="1">io/ft/fifo_out/fifo1/status_G</arg> is sourced by a combinatorial pin. This is not good design practice. Use the CE pin to control the loading of data into the flip-flop.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="372" delta="old" >Gated clock. Clock net <arg fmt="%s" index="1">io/ft/fifo_out/fifo0/status_G</arg> is sourced by a combinatorial pin. This is not good design practice. Use the CE pin to control the loading of data into the flip-flop.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="372" delta="old" >Gated clock. Clock net <arg fmt="%s" index="1">io/ft/fifo_in/fifo1/status_G</arg> is sourced by a combinatorial pin. This is not good design practice. Use the CE pin to control the loading of data into the flip-flop.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="372" delta="old" >Gated clock. Clock net <arg fmt="%s" index="1">io/ft/fifo_in/fifo0/status_G</arg> is sourced by a combinatorial pin. This is not good design practice. Use the CE pin to control the loading of data into the flip-flop.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="372" delta="old" >Gated clock. Clock net <arg fmt="%s" index="1">mem1/ram/ppfifo_wr/fifo0/status_G</arg> is sourced by a combinatorial pin. This is not good design practice. Use the CE pin to control the loading of data into the flip-flop.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="372" delta="old" >Gated clock. Clock net <arg fmt="%s" index="1">mem1/ram/ppfifo_rd/fifo0/status_G</arg> is sourced by a combinatorial pin. This is not good design practice. Use the CE pin to control the loading of data into the flip-flop.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="372" delta="old" >Gated clock. Clock net <arg fmt="%s" index="1">mem1/ram/ppfifo_wr/fifo1/status_G</arg> is sourced by a combinatorial pin. This is not good design practice. Use the CE pin to control the loading of data into the flip-flop.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem10</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem11</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem12</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem13</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem14</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem15</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem16</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem1</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem2</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem3</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem4</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem5</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem6</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem7</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem8</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2212" delta="old" >Async clocking for BRAM (comp <arg fmt="%s" index="1">lax1/la/dpb/Mram_mem9</arg>) port(s) with READ_FIRST mode has certain restrictions. Make sure that there is no address collision. A read/write on one port and a write operation from the other port at the same address is not allowed.<arg fmt="%s" index="2"> RAMB16BWER, when both ports are 18 bits wide or smaller, A13-6 including A4 cannot be same. When any one port is 36 bits wide, A13-7 including A5 cannot be the same. </arg>Violating this restriction may result in the incorrect operation of the BRAM.
+</msg>
+
+<msg type="warning" file="PhysDesignRules" num="2410" delta="old" >This design is using one or more 9K Block RAMs (RAMB8BWER).  9K Block RAM initialization data, both user defined and default, may be incorrect and should not be used.  For more information, please reference Xilinx Answer Record 39999.
+</msg>
+
+</messages>
+

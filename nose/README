@@ -1,0 +1,22 @@
+Using Nose:
+
+To run all tests:
+
+nosetests
+
+To run only one module of tests:
+
+nosetests test.test_example1
+
+to run only one test in one module:
+
+nosetests test.test_example1:Test.test_example1_func
+
+TEST DO NOT NEED TO BE UNIT TEST
+can be a simple python module with the word 'test' in the name
+
+to run the test without unittest
+
+nosetests test.test_simple_example1:test_simple_example1_func
+
+

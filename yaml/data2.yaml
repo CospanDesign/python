@@ -1,0 +1,21 @@
+name: Dave
+value: 10
+float_value: 1.138
+mydict:
+    item1: Yes
+    item2: a string
+    item3: 100
+
+l:
+  - 1
+    2
+    3
+
+
+test_ref: &id001
+  v1: 1
+  v2: 2
+  v3: a name
+
+test_pointer: *id001
+
