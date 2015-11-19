@@ -45,6 +45,10 @@ def main(argv):
         epilog=EPILOG
     )
 
+    parser.add_argument("-t", "--test",
+                        nargs=1,
+                        default="something")
+
     parser.add_argument("-d", "--debug",
                         action="store_true",
                         help="Enable Debug Messages")
@@ -52,6 +56,9 @@ def main(argv):
     args = parser.parse_args()
     print "Running Script: %s" % NAME
 
+
+    if args.debug:
+        print "test: %s" % str(args.test
 
 if __name__ == "__main__":
     main(sys.argv)
