@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 # Copyright (c) 2015 Dave McCoy (dave.mccoy@cospandesign.com)
 #
@@ -34,9 +34,6 @@ EPILOG = "\n" \
          "\tSomething\n" \
          "\n"
 
-debug = False
-
-
 def main(argv):
     #Parse out the commandline arguments
     parser = argparse.ArgumentParser(
@@ -58,7 +55,7 @@ def main(argv):
 
 
     if args.debug:
-        print "test: %s" % str(args.test
+        print "test: %s" % str(args.test)
 
 if __name__ == "__main__":
     main(sys.argv)
