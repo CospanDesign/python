@@ -44,7 +44,7 @@ def main(argv):
 
     parser.add_argument("-t", "--test",
                         nargs=1,
-                        default="something")
+                        default=["something"])
 
     parser.add_argument("-d", "--debug",
                         action="store_true",
@@ -55,7 +55,7 @@ def main(argv):
 
 
     if args.debug:
-        print "test: %s" % str(args.test)
+        print "test: %s" % str(args.test[0])
 
 if __name__ == "__main__":
     main(sys.argv)

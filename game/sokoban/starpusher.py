@@ -445,6 +445,7 @@ def readLevelsFile(filename):
         if line != '':
             # This line is part of the map.
             mapTextLines.append(line)
+
         elif line == '' and len(mapTextLines) > 0:
             # A blank line indicates the end of a level's map in the file.
             # Convert the text in mapTextLines into a level object.
@@ -454,6 +455,7 @@ def readLevelsFile(filename):
             for i in range(len(mapTextLines)):
                 if len(mapTextLines[i]) > maxWidth:
                     maxWidth = len(mapTextLines[i])
+
             # Add spaces to the ends of the shorter rows. This
             # ensures the map will be rectangular.
             for i in range(len(mapTextLines)):
@@ -462,6 +464,7 @@ def readLevelsFile(filename):
             # Convert mapTextLines to a map object.
             for x in range(len(mapTextLines[0])):
                 mapObj.append([])
+
             for y in range(len(mapTextLines)):
                 for x in range(maxWidth):
                     mapObj[x].append(mapTextLines[y][x])
