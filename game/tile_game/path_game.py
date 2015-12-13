@@ -37,40 +37,6 @@ EPILOG = "\n" \
          "\tSomething\n" \
          "\n"
 
-
-CAM_MOVE_SPEED  = 5 # how many pixels per frame the camera moves
-
-# The percentage of outdoor tiles that have additional
-# decoration on them, such as a tree or rock.
-OUTSIDE_DECORATION_PCT = 20
-
-GRAY        = (0x7F, 0x7F, 0x7F)
-NAVYBLUE    = (0x3F, 0x3F, 0x7F)
-WHITE       = (0xFF, 0xFF, 0xFF)
-RED         = (0xFF, 0x00, 0x00)
-GREEN       = (0x00, 0xFF, 0x00)
-BLUE        = (0x00, 0x00, 0xFF)
-YELLOW      = (0xFF, 0xFF, 0x00)
-ORANGE      = (0xFF, 0x7F, 0x00)
-PURPLE      = (0xFF, 0x00, 0xFF)
-CYAN        = (0x00, 0xFF, 0xFF)
-BLACK       = (0x00, 0x00, 0x00)
-
-BRUSE       = (0x3F, 0x00, 0xFF)
-
-BGCOLOR         = BRUSE
-BGCOLOR_MANUAL  = ORANGE
-TEXTCOLOR       = BLACK
-
-
-
-ASSET_BASE      = os.path.join(os.path.dirname(__file__), "assets")
-
-DEFAULT_GAME_NAME = 'Tile Game'
-DEFAULT_LEVEL_FILE = 'levels.txt'
-DEFAULT_BASIC_FONT = 'freesansbold.ttf'
-
-
 class Game(object):
 
     @staticmethod
@@ -89,7 +55,7 @@ class Game(object):
         #Setup the fonts
         self.basic_font = pygame.font.Font(DEFAULT_BASIC_FONT, 18)
 
-        self.images = { 'uncovered goal': pygame.image.load(Game.asset('RedSelector.png')),
+        self.assets = { 'uncovered goal': pygame.image.load(Game.asset('RedSelector.png')),
                         'covered goal':   pygame.image.load(Game.asset('Selector.png')),
                         'star':           pygame.image.load(Game.asset('Star.png')),
                         'corner':         pygame.image.load(Game.asset('Wall_Block_Tall.png')),
@@ -109,15 +75,6 @@ class Game(object):
                         'tall tree':      pygame.image.load(Game.asset('Tree_Tall.png')),
                         'ugly tree':      pygame.image.load(Game.asset('Tree_Ugly.png'))}
 
-        self.tile_image = { 'x': self.images['corner'],
-                            '#': self.images['wall'],
-                            'o': self.images['inside floor'],
-                            ' ': self.images['outside floor']}
-
-        self.out_image  = { '1': self.images['rock'],
-                            '2': self.images['short tree'],
-                            '3': self.images['tall tree'],
-                            '4': self.images['ugly tree']}
 
         self.levels = []
         self.level_map = None
@@ -127,8 +84,7 @@ class Game(object):
         self.level_num = 0
         self.current_level = None
         self.state = STATE.START
-        self.manual_mode = False
-        self.players = []
+        self.manual_mode = True
 
     def terminate(self):
         pygame.quit()
@@ -238,7 +194,7 @@ class Game(object):
         """
         Display the start screen
         """
-        title_rect = self.images['title'].get_rect()
+        title_rect = self.assets['title'].get_rect()
         top_coord = 50
         title_rect.top = top_coord
         title_rect.centerx = HALF_WINWIDTH
@@ -254,7 +210,7 @@ class Game(object):
 
         #Start Drawing a blank color to the entire window
         self.display_surface.fill(BGCOLOR)
-        self.display_surface.blit(self.images["title"], title_rect)
+        self.display_surface.blit(self.assets["title"], title_rect)
 
         #Position and draw the text
         for i in range(len(instruction_text)):
@@ -306,211 +262,58 @@ class Game(object):
 
         redraw_map = False
 
+        actors = self.level_map.get_actors()
         if self.manual_mode:
             if player_move_to is not None:
-                moved = self.make_move(self.players["cat"], player_move_to)
+                print "Move:"
+                actors[self.main_character].move(player_move_to)
+                self.level_map.draw_map()
+            '''
+            #if player_move_to is not None:
+                #cat = self.players["cat"]
+                #moved = cat.make_move(self.players["cat"], player_move_to)
             
-                if moved:
-                    state['step_counter'] += 1
-                    self.draw_map() 
+                #if moved:
+                #    state['step_counter'] += 1
+                #    self.draw_map() 
+            '''
             
             self.display_surface.fill(BGCOLOR_MANUAL)
 
 
         else:
+            #Use the automatic movement
             self.display_surface.fill(BGCOLOR)
+            for name in actors:
+                actors[name].process(None)
+                self.level_map.draw_map()
 
-
-
-
-        map_surface_rect = self.level_map.get_rect()
+        map_surface = self.level_map.get_level_surface()
+        map_surface_rect = map_surface.get_rect()
         map_surface_rect.center = (HALF_WINWIDTH, HALF_WINHEIGHT)
 
-        self.display_surface.blit(self.level_map, map_surface_rect)
+        self.display_surface.blit(map_surface, map_surface_rect)
 
         pygame.display.update()
         self.fpsclock.tick()
 
     def setup_level(self):
-        self.players = {}
-        self.current_level = copy.deepcopy(self.levels[self.level_num])
-        start_state = copy.deepcopy(self.current_level["start_state"])
-        level_surface = self.basic_font.render("Level %s of %s" % (self.level_num + 1, len(self.levels)), 1, TEXTCOLOR)
-        level_rect = level_surface.get_rect()
-        level_rect.bottomleft = (20, WINHEIGHT - 35)
-        map_object = self.decorate_map()
-        self.current_level["map_object"] = map_object
-        state = {   "x":            start_state["player"][0],
-                    "y":            start_state["player"][1],
-                    "step_counter": 0,
-                    "mice":         start_state["mice"]}
-        self.current_level["state"] = state
-        self.draw_map()
-        self.state = STATE.RUN_LEVEL
-
+        self.current_level = self.levels[self.level_num]
+        start_state = self.current_level["start_state"]
         #Add the game actors
-        self.players["cat"] = Cat("cat", state["x"], state["y"])
-        self.players["mice"] = []
+        actors = {}
+        actors["cat"] = Cat("cat", start_state['player'][0], start_state['player'][1])
         for i in range (len(start_state["mice"])):
             m = start_state["mice"][i]
             name = "mouse %d" % i
-            self.players["mice"].append(Mouse(name, m[0], m[1]))
+            actors[name] = Mouse(name, m[0], m[1])
+
+        self.level_map = SimpleMap(self.current_level["map_object"], actors, self.assets)
+        self.level_map.draw_map()
+
+        self.state = STATE.RUN_LEVEL
 
 #Map Specific Functions
-    def draw_map(self):
-        map_object = self.current_level["map_object"]
-        state = self.current_level["state"]
-        goals = self.current_level["goals"]
-        map_width = len(map_object) * TILEWIDTH
-        map_height = (len(map_object[0]) - 1) * TILEFLOORHEIGHT + TILEHEIGHT
-        map_surface = pygame.Surface((map_width, map_height))
-        map_surface.fill(BGCOLOR)
-
-        for x in range(len(map_object)):
-            for y in range(len(map_object[x])):
-                space_rect = pygame.Rect((x * TILEWIDTH, y * TILEFLOORHEIGHT, TILEWIDTH, TILEHEIGHT))
-                if map_object[x][y] in self.tile_image:
-                    base_tile = self.tile_image[map_object[x][y]]
-                elif map_object[x][y] in self.out_image:
-                    base_tile = self.tile_image[' ']
-
-                map_surface.blit(base_tile, space_rect)
-                if map_object[x][y] in self.out_image:
-                    map_surface.blit(self.out_image[map_object[x][y]], space_rect)
-
-                elif (x, y) in state['mice']:
-                    if (x, y) in goals:
-                        # A goal AND star are on thsi space, draw goal first
-                        map_surface.blit(self.images["covered goal"], space_rect)
-
-                    #Draw the star afterwards (It will be on top!)
-                    map_surface.blit(self.images["mouse"], space_rect)
-
-                elif (x, y) in goals:
-                    #Draw a goal without a star on it
-                    map_surface.blit(self.images['uncovered goal'], space_rect)
-
-                if (x, y) == (state['x'], state['y']):
-                    map_surface.blit(self.images[self.main_character], space_rect)
-
-        self.level_map = map_surface
-
-    def decorate_map(self):
-        '''
-        Replace the nothingness void that is my life outside the walls of the
-        level with random prettyness
-        '''
-        startx = self.current_level['start_state']['player'][0]
-        starty = self.current_level['start_state']['player'][1]
-        map_object = self.current_level['map_object']
-        for x in range(len(map_object)):
-            for y in range(len(map_object[0])):
-                if map_object[x][y] in ('$', '.', '@', '+', '*'):
-                    map_object[x][y] = ' '
-        #Flood fill to determine inside and outside of floor tiles
-        self.flood_fill(map_object, startx, starty, ' ', 'o')
-
-        #Convert adjoined walls into corner tiles
-        for x in range(len(map_object)):
-            for y in range(len(map_object[0])):
-                if map_object[x][y] == '#':
-                    if (self.is_wall(x, y-1) and self.is_wall(x+1, y)) or \
-                       (self.is_wall(x+1, y) and self.is_wall(x, y+1)) or \
-                       (self.is_wall(x, y+1) and self.is_wall(x-1, y)) or \
-                       (self.is_wall(x-1, y) and self.is_wall(x, y-1)):
-                        map_object[x][y] = 'x'
-
-                elif map_object[x][y] == ' ' and random.randint(0, 99) < OUTSIDE_DECORATION_PCT:
-                    map_object[x][y] = random.choice(list(self.out_image.keys()))
-        return map_object
-
-    def is_blocked(self, x, y):
-        """Returns True if the (x, y) position on the map is
-        blocked by a wall or star, otherwise return False."""
-        map_object = self.current_level["map_object"]
-        state = self.current_level['state']
-
-        if self.is_wall(x, y):
-            return True
-
-        elif x < 0 or x >= len(map_object) or y < 0 or y >= len(map_object[x]):
-            return True # x and y aren't actually on the map.
-
-        elif (x, y) in state['mice']:
-            return True # a star is blocking
-
-        return False
-
-    def is_wall(self, x, y):
-        """Returns True if the (x, y) position on
-        the map is a wall, otherwise return False."""
-        map_object = self.current_level['map_object']
-        if x < 0 or x >= len(map_object) or y < 0 or y >= len(map_object[x]):
-            return False # x and y aren't actually on the map.
-        elif map_object[x][y] in ('#', 'x'):
-            return True # wall is blocking
-        return False
-
-    def flood_fill(self, map_object, x, y, old_char, new_char):
-        """Changes any values matching oldCharacter on the map object to
-        newCharacter at the (x, y) position, and does the same for the
-        positions to the left, right, down, and up of (x, y), recursively."""
-
-        # In this game, the flood fill algorithm creates the inside/outside
-        # floor distinction. This is a "recursive" function.
-        # For more info on the Flood Fill algorithm, see:
-        #   http://en.wikipedia.org/wiki/Flood_fill
-
-        if map_object[x][y] == old_char:
-            map_object[x][y] = new_char
-
-        if x < len(map_object) - 1 and map_object[x+1][y] == old_char:
-            self.flood_fill(map_object, x+1, y, old_char, new_char) # call right
-        if x > 0 and map_object[x-1][y] == old_char:
-            self.flood_fill(map_object, x-1, y, old_char, new_char) # call left
-        if y < len(map_object[x]) - 1 and map_object[x][y+1] == old_char:
-            self.flood_fill(map_object, x, y+1, old_char, new_char) # call down
-        if y > 0 and map_object[x][y-1] == old_char:
-            self.flood_fill(map_object, x, y-1, old_char, new_char) # call up
-
-    #Movement Functions
-    def make_move(self, actor, move_to):
-        state = self.current_level["state"]
-        px = actor.get_x()
-        py = actor.get_y()
-        #px = state['x']
-        #py = state['y']
-        #mice = state['mice']
-        map_object = self.current_level["map_object"]
-
-        if move_to == DIRECTIONS.UP:
-            x_offset = 0
-            y_offset = -1
-        elif move_to == DIRECTIONS.RIGHT:
-            x_offset = 1
-            y_offset = 0
-        elif move_to == DIRECTIONS.DOWN:
-            x_offset = 0
-            y_offset = 1
-        elif move_to == DIRECTIONS.LEFT:
-            x_offset = -1
-            y_offset = 0
-
-        if self.is_wall(px + x_offset, py + y_offset):
-            return False
-
-        '''
-        if (px + x_offset, py + y_offset) in mice:
-            if not self.is_blocked(px + (x_offset * 2), py + (y_offset * 2)):
-                #Move the star
-                ind = mice.index((px + x_offset, py + y_offset))
-                mice[ind] = (mice[ind][0] + x_offset, mice[ind][1] + y_offset)
-            else:
-                return False
-        '''
-        #state['x'] = px + x_offset
-        #state['y'] = py + y_offset
-        return True
 
 def main(argv):
     #Parse out the commandline arguments

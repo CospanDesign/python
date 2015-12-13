@@ -7,11 +7,11 @@
 ;
 ; The format is described at:
 ; http://sokobano.de/wiki/index.php?title=Level_format
-;   @ - The starting position of the player.
+;   @ - Starting position of the cat
 ;   $ - The starting position for a pushable star.
 ;   . - A goal where a star needs to be pushed.
 ;   + - Player & goal
-;   * - Star & goal
+;   * - mouse (goal)
 ;  (space) - an empty open space.
 ;   # - A wall.
 ;
@@ -23,10 +23,10 @@
 ; and name it "starPusherLevels.txt" (after renaming this file, of course).
 
 
-; Starting demo level:
+; The saga begins
 ################
 #              #
-#              #
+#           *  #
 #              #
 # @            #
 #              #
