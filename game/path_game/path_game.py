@@ -265,7 +265,7 @@ class Game(object):
         actors = self.level_map.get_actors()
         if self.manual_mode:
             if player_move_to is not None:
-                print "Move:"
+                #print "Move:"
                 actors[self.main_character].move(player_move_to)
                 self.level_map.draw_map()
             '''

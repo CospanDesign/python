@@ -5,7 +5,7 @@ def enum(*sequential, **named):
   return type('Enum', (), enums)
 
 
-DIRECTIONS = enum ("UP", "DOWN", "LEFT", "RIGHT")
+DIRECTIONS = enum ("UP", "DOWN", "LEFT", "RIGHT", "UPLEFT", "UPRIGHT", "DOWNLEFT", "DOWNRIGHT", "NOMOVE")
 STATE = enum ("START", "SETUP_LEVEL", "RUN_LEVEL", "FINISHED")
 
 FPS             = 30 # frames per second to update the screen

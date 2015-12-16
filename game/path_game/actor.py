@@ -43,12 +43,31 @@ class Actor(object):
         if move_to == DIRECTIONS.UP:
             x_offset = 0
             y_offset = -1
+
+        elif move_to == DIRECTIONS.UPRIGHT:
+            x_offset = 1
+            y_offset = -1
+
+        elif move_to == DIRECTIONS.UPLEFT:
+            x_offset = -1
+            y_offset = -1
+
         elif move_to == DIRECTIONS.RIGHT:
             x_offset = 1
             y_offset = 0
+
         elif move_to == DIRECTIONS.DOWN:
             x_offset = 0
             y_offset = 1
+
+        elif move_to == DIRECTIONS.DOWNRIGHT:
+            x_offset = 1
+            y_offset = 1
+
+        elif move_to == DIRECTIONS.DOWNLEFT:
+            x_offset = -1
+            y_offset = 1
+
         elif move_to == DIRECTIONS.LEFT:
             x_offset = -1
             y_offset = 0
