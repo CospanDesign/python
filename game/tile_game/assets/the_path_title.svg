@@ -15,7 +15,10 @@
    width="462"
    height="262"
    viewBox="0 0 462 262"
-   sodipodi:docname="the_path_title.svg">
+   sodipodi:docname="the_path_title.svg"
+   inkscape:export-filename="/home/cospan/Projects/python/game/tile_game/assets/the_path_title.png"
+   inkscape:export-xdpi="84.220001"
+   inkscape:export-ydpi="84.220001">
   <metadata
      id="metadata8">
     <rdf:RDF>
@@ -104,7 +107,7 @@
      id="namedview4"
      showgrid="false"
      inkscape:zoom="1.3852814"
-     inkscape:cx="-32.415169"
+     inkscape:cx="-41.799544"
      inkscape:cy="33.608654"
      inkscape:window-x="0"
      inkscape:window-y="0"
