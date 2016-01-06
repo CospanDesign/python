@@ -112,6 +112,9 @@ class RoamingRalphDemo(ShowBase):
         self.disableMouse()
         self.camera.setPos(self.ralph.getX(), self.ralph.getY() + 10, 2)
 
+
+
+
         # We will detect the height of the terrain by creating a collision
         # ray and casting it downward toward the terrain.  One ray will
         # start above ralph's head, and the other will start above the camera.

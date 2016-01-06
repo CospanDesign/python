@@ -48,7 +48,6 @@ RALPH_ACTOR = "models/ralph"
 RALPH_ACTIONS = {"walk": "models/ralph-walk",
                  "run": "models/ralph-run"}
 
-
 # Function to put instructions on the screen.
 def add_instructions(pos, msg):
     return OnscreenText(text=msg, style=1, fg=(1, 1, 1, 1), scale=.05,
@@ -61,7 +60,6 @@ def add_title(text):
                         parent=base.a2dBottomRight, align=TextNode.ARight,
                         pos=(-0.1, 0.09), shadow=(0, 0, 0, 1))
 
-
 class PandaPath (ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
@@ -69,11 +67,26 @@ class PandaPath (ShowBase):
         #Set the background color to black
         self.win.setClearColor((0, 0, 0, 1))
 
-
         # This is used to store which keys are currently pressed.
         self.key_map = {
-            "left": 0, "right": 0, "forward": 0, "cam-left": 0, "cam-right": 0}
+            "left":         0,
+            "right":        0,
+            "forward":      0,
+            "cam-left":     0,
+            "cam-right":    0}
 
+
+
+        #Post the Instruction
+        self.title = add_title( "Panda 3D Tutorial: Roaming Panda!")
+
+        #Instructions
+        self.inst1 = add_instructions(0.06, "[ESC]: Quit")
+        self.inst2 = add_instructions(0.12, "[Left Arrow]: Rotate Left")
+        self.inst3 = add_instructions(0.18, "[Right Arrow]: Rotate Ralph Right")
+        self.inst4 = add_instructions(0.24, "[Up Arrow]: Run Ralph Forward")
+        self.inst6 = add_instructions(0.30, "[A]: Rotate Camera Left")
+        self.inst7 = add_instructions(0.36, "[S]: Rotate Camera Right")
 
         #Load the Environment Model
         self.environ = self.loader.loadModel(ENVIRONMENT)
@@ -98,7 +111,6 @@ class PandaPath (ShowBase):
         self.ralph.loop("walk")
 
         #Create a floater object, which floats 2 units above rlaph. We use this as a target for the camera to look at
-
         self.floater = NodePath(PandaNode("floater"))
         self.floater.reparentTo(self.ralph)
         self.floater.setZ(2.0)
@@ -108,7 +120,7 @@ class PandaPath (ShowBase):
         #Configure the Camera
         #Add the spin camera taks procedure to the taks manager
         #self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
-        #self.disableMouse()
+        self.disableMouse()
         self.camera.setPos(self.ralph.getX(), self.ralph.getY() + 10, 2)
 
 
@@ -141,16 +153,31 @@ class PandaPath (ShowBase):
 
 
 
-        #Post the Instruction
-        self.title = add_title( "Panda 3D Tutorial: Roaming Panda!")
 
-        #Instructions
-        self.inst1 = add_instructions(0.06, "[ESC]: Quit")
 
         #Accept certain control keys
         self.accept("escape", sys.exit)
+        self.accept("arrow_left", self.set_key, ["left", True])
+        self.accept("arrow_right", self.set_key, ["right", True])
+        self.accept("arrow_up", self.set_key, ["forward", True])
+        self.accept("a", self.set_key, ["cam-left", True])
+        self.accept("s", self.set_key, ["cam-right", True])
+        self.accept("arrow_left-up", self.set_key, ["left", False])
+        self.accept("arrow_right-up", self.set_key, ["right", False])
+        self.accept("arrow_up-up", self.set_key, ["forward", False])
+        self.accept("a-up", self.set_key, ["cam-left", False])
+        self.accept("s-up", self.set_key, ["cam-right", False])
+
+        taskMgr.add(self.move, "moveTask")
+
 
         self.camera.lookAt(self.floater)
+
+
+        #Game States
+        self.is_moving = False
+
+
 
     def spinCameraTask(self, task):
         angle_degrees = task.time * 6.0
@@ -159,6 +186,19 @@ class PandaPath (ShowBase):
         self.camera.setHpr(angle_degrees, 0, 0)
         #self.camera.setHpr(angle_degrees, 0, angle_degrees)
         return Task.cont
+
+    def set_key(self, key, value):
+        self.key_map[key] = value
+
+
+    def move(self, task):
+        dt = globalClock.getDt()
+        print "DT: %f" % dt
+        if self.key_map["cam-left"]:
+            self.camera.setX(self.camera, -20 * dt)
+        elif self.key_map["cam-right"]:
+            self.camera.setY(self.camera, +20 * dt)
+        
 
 def main(argv):
     #Parse out the commandline arguments
