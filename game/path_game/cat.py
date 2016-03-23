@@ -1,6 +1,10 @@
+import sys
 import actor
+import path
 import simple_map
 import simple_path
+from game_defines import DIRECTIONS
+
 CAT_IMAGE_NAME = "cat.png"
 
 
@@ -23,11 +27,14 @@ class Cat(actor.Actor):
         move_to = None
 
         if target is not None:
-            move_to = self.path.update(self.x, self.y, target[0], target[1])
+            #print "Target: %s" % str(target)
+            if target[0] != self.x or target[1] != self.y:
+                p = self.path.update(self.x, self.y, target[0], target[1])
+                print "Path: %s" % str(p)
+                move_to = path.get_next_move(p, debug = True)
 
-        if move_to is not None:
-            self.move(move_to)
-
+                if move_to is not DIRECTIONS.NOMOVE:
+                    self.move(move_to)
 
     def find_mouse(self, sensor_input):
         if self.map_object.is_mouse_visible():
