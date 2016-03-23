@@ -33,7 +33,34 @@ DESCRIPTION = "Read and Write GPIOs with FTDI chip\n" \
 EPILOG = "\n" \
          "\n" \
          "Examples:\n" \
-         "\tSomething\n" \
+         "\tExample: Reading all the GPIO for the lower section of the second bank:\n" \
+         "\t$ ./ftdi-gpio\n" \
+         "\t Pins: 0xFF\n" \
+         "\n"\
+         "\tExample: Reading the value of one pin (bit 6), specifically a bit attached to a button:\n" \
+         "\n"\
+         "\tNot Pressed (Button is high when not pressed)\n" \
+         "\t$ ./ftdi-gpio --rdbit 6\n" \
+         "\t\tPins 6: True\n" \
+         "\t\tPins: 0xFF\n" \
+         "\t\n" \
+         "\tNot Pressed (Button is high when not pressed)\n" \
+         "\t$ ./ftdi-gpio --rdbit 6\n" \
+         "\t\tPins 6: False\n" \
+         "\t\tPins: 0xBF\n" \
+         "\t\n" \
+         "\tSet GPIO 4 to an output and set that value high\n" \
+         "\t$ ./ftdi-gpio --wrbit 4 --value 1\n" \
+         "\t\tPins: 0xFF\n" \
+         "\t\n" \
+         "\tExample: Writing a '1' to another pin (bit 4), specifically the signal to reprogram my FPGA\n" \
+         "\tSet GPIO 4 to an output and set that output low\n" \
+         "\t$ ./ftdi-gpio --wrbit 4 --value 0\n" \
+         "\t\tPins: 0xEF\n" \
+         "\t\n" \
+         "\tExample: Explicitly declaring vendor id, product id and interface and then reading all the GPIOs\n" \
+         "\t$ ./ftdi-gpio --vendor 0403 --product 8530 --interface 2\n" \
+         "\t\tPins: 0xFF\n" \
          "\n"
 
 DEFAULT_VENDOR="0403"
