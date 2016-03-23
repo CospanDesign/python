@@ -1,0 +1,171 @@
+#! /usr/bin/env python
+
+# Copyright (c) 2015 Dave McCoy (dave.mccoy@cospandesign.com)
+#
+# Nysa is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# any later version.
+#
+# Nysa is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Nysa; If not, see <http://www.gnu.org/licenses/>.
+
+
+import sys
+import os
+import argparse
+
+from gpio_controller import GPIOController
+
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+
+NAME = os.path.basename(os.path.realpath(__file__))
+
+DESCRIPTION = "Read and Write GPIOs with FTDI chip\n" \
+              "Default Behavior is to read the GPIOs from the specified interface\n" \
+              "usage: %s [options]\n" % NAME
+
+EPILOG = "\n" \
+         "\n" \
+         "Examples:\n" \
+         "\tSomething\n" \
+         "\n"
+
+DEFAULT_VENDOR="0403"
+DEFAULT_PRODUCT="8530"
+DEFAULT_INTERFACE="2"
+
+DEFAULT_WRITE_BIT=6
+DEFAULT_WRITE_MASK="0x40"
+DEFAULT_READ_BIT="40"
+
+
+def main(argv):
+    #Parse out the commandline arguments
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=DESCRIPTION,
+        epilog=EPILOG
+    )
+
+    parser.add_argument("--vendor",
+                        nargs=1,
+                        default=[DEFAULT_VENDOR],
+                        help="Specify USB Vendor ID (Default: %s)" % DEFAULT_VENDOR)
+    parser.add_argument("--product",
+                        nargs=1,
+                        default=[DEFAULT_PRODUCT],
+                        help="Specify USB Product ID (Default: %s)" % DEFAULT_PRODUCT)
+    parser.add_argument("--interface",
+                        nargs=1,
+                        default=[DEFAULT_INTERFACE],
+                        help="Specify USB Interface (Default: %s)" % DEFAULT_INTERFACE)
+
+    parser.add_argument("-b", "--wrbit",
+                        nargs=1,
+                        help="Specify the bit to set (Example: %s)" % DEFAULT_WRITE_BIT)
+
+    parser.add_argument("-m", "--wrmask",
+                        nargs=1,
+                        help="Specify a bitmask value to write (Example: %s)" % DEFAULT_WRITE_MASK)
+
+    parser.add_argument("-t", "--rdbit",
+                        nargs=1,
+                        help="Read back the mask and compare it with index (Example: %s)" % DEFAULT_READ_BIT)
+
+    parser.add_argument("-s", "--dirmask",
+                        nargs=1,
+                        help="Configure bit mask of the chip, will be default the values associated with output")
+
+    parser.add_argument("-v", "--value",
+                        nargs=1,
+                        default=["1"],
+                        help="For write set this to 1 or 0 for high or low")
+
+    parser.add_argument("-d", "--debug",
+                        action="store_true",
+                        help="Enable Debug Messages")
+
+    args = parser.parse_args()
+    if args.debug: print "Running Script: %s" % NAME
+
+    #Set up all the default values
+    enable_read_mask = False
+    enable_read_bit = False
+    enable_write_mask = False
+    enable_write_bit = False
+    enable_value = False
+
+    write_mask = 0x00
+    read_mask = 0x00
+    write_bit = 0x00
+    read_bit = 0x00
+    dir_mask = 0x00
+    read_pins = 0x00
+
+    #Decode Incomming command into something more readable
+    vendor = int(args.vendor[0], 16)
+    product = int(args.product[0], 16)
+    interface = int(args.interface[0], 0)
+    enable_value = int(args.value[0], 0)
+
+    if args.debug:
+        print ("Attempt to open USB Device: %04X:%04X" % (vendor, product))
+        print ("\tInterface: %d" % interface)
+
+    if args.wrmask is not None:
+        #Read a specified bit
+        enable_write_mask = True
+        write_mask = int(args.wrmask[0], 16)
+        dir_mask = write_mask
+        if args.debug: print ("Write a bit mask: %0X" % write_mask)
+
+    elif args.wrbit is not None:
+        #Write a specified bit
+        enable_write_bit = True
+        write_bit = int(args.wrbit[0], 0)
+        dir_mask = 1 << write_bit
+        if args.debug: print ("Write a single bit at index: %d" % write_bit)
+
+    elif args.rdbit is not None:
+        #Read a specified bit
+        enable_read_bit = True
+        read_bit = int(args.rdbit[0], 0)
+        if args.debug: print ("Read a single bit at index: %d" % read_bit)
+
+    else:
+        #Default Behavior 
+        enable_read_mask = True
+        if args.debug: print ("Read all the bits")
+
+    if args.dirmask is not None:
+        dirmask = int(args.dirmask[0], 0)
+
+    gpio = GPIOController(vendor, product, interface)
+    gpio.set_pin_direction_mask(dir_mask)
+
+    if enable_write_mask:
+        gpio.enable_pins(enable_value)
+        if args.debug: print ("Wrote Mask")
+
+    elif enable_write_bit:
+        gpio.enable_pin(write_bit, enable_value)
+        if args.debug: print ("Wrote Bit")
+
+    elif enable_read_bit:
+        read_pin = gpio.read_pin(read_bit)
+        print "Pins %d: %s" % (read_bit, read_pin)
+
+    read_pins = gpio.read_pins()
+    print "Pins: 0x%02X" % read_pins
+
+
+if __name__ == "__main__":
+    main(sys.argv)
+
+
