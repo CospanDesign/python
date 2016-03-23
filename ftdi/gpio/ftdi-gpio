@@ -150,7 +150,7 @@ def main(argv):
     gpio.set_pin_direction_mask(dir_mask)
 
     if enable_write_mask:
-        gpio.enable_pins(enable_value)
+        gpio.enable_pins(write_mask, enable_value)
         if args.debug: print ("Wrote Mask")
 
     elif enable_write_bit:
