@@ -75,6 +75,50 @@ def gen_image_derivatives(gray_image):
 
     return (image_x, image_y)
 
+def gen_image_sobel(gray_image):
+    '''
+    Pass in a grayscale image in ndarray format
+
+    Returns tuple of image derivatives
+    (image dx, image dy)
+    '''
+    height = len(gray_image)
+    width = len(gray_image[0])
+    #print "Width: %d" % width
+    #print "Height: %d" % height
+
+    #Find the derivative of an image
+    image_x = np.ndarray(shape=(height, width), dtype=np.int32)
+    image_y = np.ndarray(shape=(height, width), dtype=np.int32)
+    for y in range(0, height - 1):
+        for x in range(0, width - 1):
+            #Get rid of edge cases
+            if (x < 1) or (y < 1) or (x > width - 1) or (y > height - 1):
+                image_x[y, x] = 0
+
+            #X Data
+            #Ros Before
+            image_x[y, x]  =  gray_image[y - 1, x + 1] - gray_image[y - 1, x - 1]
+            #Current Ros
+            image_x[y, x] +=  (gray_image[y    , x + 1] * 2) - (gray_image[y    , x - 1] * 2)
+            #Row After
+            image_x[y, x] +=  gray_image[y + 1, x + 1] - gray_image[y + 1, x - 1]
+            image_x[y, x] = int(abs(image_x[y, x]) / 4)
+
+            #Y Data
+            #Column Above
+            image_y[y, x]  =  gray_image[y + 1, x - 1] - gray_image[y - 1, x - 1]
+            #Current Column
+            image_y[y, x] +=  (gray_image[y + 1, x    ] * 2) - (gray_image[y - 1, x    ] * 2)
+            #Column Below
+            image_y[y, x] +=  gray_image[y + 1, x + 1] - gray_image[y - 1, x + 1]
+            image_y[y,x] = int (abs(image_y[y, x]) / 4)
+
+
+    return (image_x, image_y)
+
+
+
 
 GAUSSIAN_BITRANGE=18
 GAUSSIAN_DIST=1 #Mapping from gaussian location to array position (1 = 1:1)
@@ -150,10 +194,10 @@ def generate_matrix_values(ix, iy, ga):
     win_x_midpoint = int(win_width / 2)
     win_y_midpoint = int(win_height / 2)
 
-    print ("window width: %d" % win_width)
-    print ("window height: %d" % win_height)
-    print ("window midpoint x: %d" % win_x_midpoint)
-    print ("window midpoint y: %d" % win_y_midpoint)
+    #print ("window width: %d" % win_width)
+    #print ("window height: %d" % win_height)
+    #print ("window midpoint x: %d" % win_x_midpoint)
+    #print ("window midpoint y: %d" % win_y_midpoint)
 
     a_out = np.ndarray(shape=(height, width), dtype=np.int32)
     bc_out = np.ndarray(shape=(height, width), dtype=np.int32)

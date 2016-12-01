@@ -27,18 +27,19 @@ BLOCK_SIZE = 3
 K_VALUE = 0.04
 #K_VALUE = 0.15
 
-THRESHOLD = 50000
+THRESHOLD = 2500000
 
 
-#SIGMA = float(BLOCK_SIZE) / 3.0
-SIGMA = float(BLOCK_SIZE) / 6.0
+SIGMA = float(BLOCK_SIZE) / 3.0
+#SIGMA = float(BLOCK_SIZE) / 6.0
 
 img = cv2.imread(FILENAME)
 gray = rgb2gray(img)
 
-
 cstm_out = cv2.imread(FILENAME)
 ocv_out = cv2.imread(FILENAME)
+diff_out = cv2.imread(FILENAME)
+
 
 if not COLOR_OUT:
     cstm_out = rgb2gray(cstm_out)
@@ -58,7 +59,8 @@ print "Gausian Distribution:\n%s" % str(gaussian_array)
 
 print "Creating the X and Y image derivatives...",
 start_time = time.time()
-image_x, image_y = gen_image_derivatives(gray)
+#image_x, image_y = gen_image_derivatives(gray)
+image_x, image_y = gen_image_sobel(gray)
 elapsed_time = time.time() - start_time
 print "Done: Elapsed Time: %.3f" % elapsed_time
 
@@ -98,12 +100,25 @@ ocv = cv2.cornerHarris(ocv_gray,
                        3,
                        K_VALUE)
 
-ocv = cv2.dilate(ocv,None)
 
 if COLOR_OUT:
+
     corners = cv2.dilate(corners,None)
+    ocv = cv2.dilate(ocv,None)
     cstm_out[corners == 255]=[0, 255, 0]
     ocv_out[ocv > (0.01 * ocv.max())]=[0, 255, 0]
+
+    m = ocv.max()
+    for y in range(len(diff_out)):
+        for x in range(len(diff_out[0])):
+            if (ocv[y][x] > (0.01 * m)) and (corners[y][x] == 255):
+                diff_out[y][x] = [255, 255, 0]
+            elif ocv[y][x] > (0.01 * ocv.max()):
+                diff_out[y][x] = [255, 0, 0]
+            elif corners[y][x] == 255:
+                diff_out[y][x] = [0, 255, 0]
+
+
     
 else:
     cstm_out[corners == 255]=[255]
@@ -166,6 +181,13 @@ if COLOR_OUT:
     plt.title("Openc CV HCD Result")
     plt.imshow(ocv_out)
     plt.axis('off')
+
+    f=fig.add_subplot(5,3,15)
+    plt.title("Diff Values")
+    plt.imshow(diff_out)
+    plt.axis('off')
+
+
 
 else:
     f=fig.add_subplot(5,3,13)
