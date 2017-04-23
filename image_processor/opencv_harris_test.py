@@ -11,7 +11,7 @@ print (TCOLORS.PURPLE + "OpenCV Harris Corner Detector" + TCOLORS.NORMAL)
 try:
     filename = FILENAME
 except NameError:
-    
+
     #filename = 'chessboard.png'
     #filename = 'chessboard.jpg'
     filename = 'chessboard_skew.jpg'
