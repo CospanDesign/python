@@ -19,6 +19,20 @@
 import sys
 import os
 import argparse
+import numpy as np
+import cv2
+from matplotlib import pyplot as plt
+from matplotlib.figure import SubplotParams
+from math import *
+
+
+
+DEFAULT_START_FEATURE = 25
+RED  = (0xFF, 0x00, 0x00)
+GREEN= (0x00, 0xFF, 0x00)
+BLUE = (0x00, 0x00, 0xFF)
+
+
 
 #sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
 
@@ -56,6 +70,9 @@ def main(argv):
 
     if args.debug:
         print "test: %s" % str(args.test[0])
+
+
+    cap = cv2.VideoCapture('videoplayback.mp4')
 
 if __name__ == "__main__":
     main(sys.argv)
