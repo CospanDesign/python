@@ -40,15 +40,16 @@ EPILOG      = "\n" \
               "\tSomething\n" \
               "\n"
 
-DEFAULT_START_FEATURE	= 25
-PATCH_SIZE				= 3
-PYRAMID_DEPTH			= 5
-MATCH_THRESHOLD			= 0.3
-CIRCLE_SIZE				= 10
-ENERGY_THRESHOLD		= 0.1
-ROTATION_ANGLE			= 45
-MAX_CORNERS				= 100
-PYRAMID_POS             = PYRAMID_DEPTH - 1
+DEFAULT_START_FEATURE           = 25
+PATCH_SIZE                      = 3
+PYRAMID_DEPTH                   = 5
+MATCH_THRESHOLD                 = 0.3
+CIRCLE_SIZE                     = 10
+#ENERGY_THRESHOLD                = 0.1
+ENERGY_THRESHOLD                = 0.0
+ROTATION_ANGLE                  = 0
+MAX_CORNERS                     = 100
+PYRAMID_POS                     = PYRAMID_DEPTH - 1
 
 RED   = (0xFF, 0x00, 0x00)
 GREEN = (0x00, 0xFF, 0x00)
@@ -56,27 +57,27 @@ BLUE  = (0x00, 0x00, 0xFF)
 
 
 # params for ShiTomasi corner detection
-feature_params = dict(  maxCorners	= MAX_CORNERS,
-                        qualityLevel	= 0.3,
-                        minDistance		= 7,
-                        blockSize	= 7 )
+feature_params = dict(  maxCorners      = MAX_CORNERS,
+                        qualityLevel    = 0.3,
+                        minDistance             = 7,
+                        blockSize       = 7 )
 
 # Parameters for lucas kanade optical flow
-lk_params = dict(       winSize		= (15,15),
-                        maxLevel	= 2,
-                        criteria	= (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+lk_params = dict(       winSize         = (15,15),
+                        maxLevel        = 2,
+                        criteria        = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 
-subpix_params = dict(   zeroZone	= (-1,-1),
-                        winSize		= (10,10),
-                        criteria	= (cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS,20,0.03))
+subpix_params = dict(   zeroZone        = (-1,-1),
+                        winSize         = (10,10),
+                        criteria        = (cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS,20,0.03))
 
 
 INITIAL_WARP =          [[cos(radians(ROTATION_ANGLE)), -sin(radians(ROTATION_ANGLE)), 0],
                          [sin(radians(ROTATION_ANGLE)),  cos(radians(ROTATION_ANGLE)), 0]]
 
 def get_patch(img, point, patch_size):
-    np.zeros(shape = (patch_size, patch_size), dtype=int)
-    patch = np.zeros(shape = (patch_size, patch_size), dtype=int)
+    np.zeros(shape = (patch_size, patch_size), dtype=np.uint8)
+    patch = np.zeros(shape = (patch_size, patch_size), dtype=np.uint8)
     for y in range((int(patch_size / 2) * -1), int(patch_size / 2) + 1):
         for x in range((int(patch_size / 2) * -1), int(patch_size / 2) + 1):
             py = y + int(patch_size / 2)
@@ -97,8 +98,10 @@ def apply_affine_image_warp(in_patch, in_point, transform=[[0, 0, 0], [0, 0, 0]]
     x_start = - (width / 2)
     x_end   =   (width / 2)
 
+
+    weight_patch = np.zeros(shape = (height, width), dtype=np.float32)
     #out_patch = in_patch
-    out_patch = np.zeros(shape = (height, width), dtype=int)
+    out_patch = np.zeros(shape = (height, width), dtype=np.uint8)
 
     #First apply the translation to the point under question
     out_point = [int(in_point[0] + transform[0][2]),
@@ -132,6 +135,7 @@ def apply_affine_image_warp(in_patch, in_point, transform=[[0, 0, 0], [0, 0, 0]]
                         y_energy = 1.0 - y_energy
                         cell_energy = x_energy * y_energy
                         out_patch[yout][xout] += int(cell_energy * in_patch[y_in][x_in])
+                        weight_patch[yout][xout] += cell_energy
                         print ("% 2dx% 2d -> % 2dx% 2d Output pos: % 2dx% 2d: Energy: %f: %d -> %d" %
                                 (x, y,
                                  xout - 1, yout - 1,
@@ -140,7 +144,100 @@ def apply_affine_image_warp(in_patch, in_point, transform=[[0, 0, 0], [0, 0, 0]]
                                  in_patch[y_in][x_in], 
                                 out_patch[yout][xout]))
 
+    for yout in range(0, height):
+        for xout in range(0, width):
+            print ("Weidth: % 2dx% 2d: %f" % (yout, xout, weight_patch[yout][xout]))
+            out_patch[yout][xout] = int(out_patch[yout][xout] / weight_patch[yout][xout])
+
     return out_point, out_patch
+
+def get_gradiants(gray_image, ypos, xpos):
+    #For all elements in a patch, find the gradiant of x, y and xy
+    
+    #Set the position of starting of region of interest to be half a patch before (x and y)
+    ystart = ypos - int(PATCH_SIZE / 2)
+    xstart = xpos - int(PATCH_SIZE / 2)
+    
+    #Iterate through all the elements in both Y and X region to determine the gradiant of X, Gradiant of Y and XY
+    gx = gray_image[y + 0][x + 0] + \
+         gray_image[y + 1][x + 0] + \
+         gray_image[y + 2][x + 0] - \
+         gray_image[y + 0][x + 2] - \
+         gray_image[y + 1][x + 2] - \
+         gray_image[y + 2][x + 2]
+    gy = gray_image[y + 0][x + 0] + \
+         gray_image[y + 0][x + 1] + \
+         gray_image[y + 0][x + 2] - \
+         gray_image[y + 2][x + 0] - \
+         gray_image[y + 2][x + 1] - \
+         gray_image[y + 2][x + 2]
+    gxy = gx * gy
+    return (gx, gy, gxy)
+
+def find_error_coefficents(in_patch, out_patch):
+    error = 0
+
+    sigma_x = 0
+    sigma_y = 0
+    sigma_xy = 0
+    sigma_xt = 0
+    sigma_yt = 0
+
+    h_matrix = np.zeros(shape(AFFINE_SIZE, AFFINE_SIZE), dtype=float)
+
+    for y in range(in_patch.shape[0]):
+        for x in range(in_patch.shape[1]):
+            sigma_x += in_patch[y][x]
+
+            #First Row
+            h_matrix[0, 0] = Ix_sqrd * (px * px)
+            h_matrix[0, 1] = Ix_sqrd * (px * py)
+            h_matrix[0, 2] = Ix_sqrd * (px)
+            h_matrix[0, 3] = Ixy     * (px * px)
+            h_matrix[0, 4] = Ixy     * (px * py)
+            h_matrix[0, 5] = Ixy     * (px)
+            
+            #Second Row
+            h_matrix[0, 0] = Ix_sqrd * (px * py)
+            h_matrix[0, 1] = Ix_sqrd * (py * py)
+            h_matrix[0, 2] = Ix_sqrd * (py)
+            h_matrix[0, 3] = Ixy     * (px * py)
+            h_matrix[0, 4] = Ixy     * (py * py)
+            h_matrix[0, 5] = Ixy     * (py)
+            
+            #Third Row
+            h_matrix[0, 0] = Ix_sqrd * (px)
+            h_matrix[0, 1] = Ix_sqrd * (py)
+            h_matrix[0, 2] = Ix_sqrd
+            h_matrix[0, 3] = Ixy     * (px)
+            h_matrix[0, 4] = Ixy     * (py)
+            h_matrix[0, 5] = Ixy
+            
+            #Fourth Row
+            h_matrix[0, 0] = Ixy     * (px * px)
+            h_matrix[0, 1] = Ixy     * (px * py)
+            h_matrix[0, 2] = Ixy     * (px)
+            h_matrix[0, 3] = Iy_sqrd * (px * px)
+            h_matrix[0, 4] = Iy_sqrd * (px * py)
+            h_matrix[0, 5] = Iy_sqrd * (px)
+            
+            #Fifth Row
+            h_matrix[0, 0] = Ixy     * (px * py)
+            h_matrix[0, 1] = Ixy     * (py * py)
+            h_matrix[0, 2] = Ixy     * (py)
+            h_matrix[0, 3] = Iy_sqrd * (px * py)
+            h_matrix[0, 4] = Iy_sqrd * (py * py)
+            h_matrix[0, 5] = Iy_sqrd * (py)
+            
+            #Sixth Row
+            h_matrix[0, 0] = Ixy     * (px)
+            h_matrix[0, 1] = Ixy     * (py)
+            h_matrix[0, 2] = Ixy
+            h_matrix[0, 3] = Iy_sqrd * (px)
+            h_matrix[0, 4] = Iy_sqrd * (py)
+            h_matrix[0, 5] = Iy_sqrd
+
+    return error
 
 def klt_track(image,
               prev_gray,
@@ -171,7 +268,7 @@ def klt_track(image,
     pyramid_points = [0] * pyramid_depth
 
     if debug:
-        fig = plt.figure(figsize=(10, 15))
+        fig = cv2.figure(figsize=(10, 15))
 
     for i in range (pyramid_depth):
 
@@ -187,17 +284,17 @@ def klt_track(image,
             a = fig.add_subplot(pyramid_depth, 2, pos)
             img = cv2.cvtColor(ppyramids[-1 + (-1 * i)], cv2.COLOR_GRAY2RGB)
             cv2.circle(img, (x, y), (CIRCLE_SIZE / scale), RED, -1)
-            plt.imshow(img, interpolation='none')
+            cv2.imshow(img, interpolation='none')
             a.set_title("Template: %d" % (r + 1))
          
             pos += 1
             a = fig.add_subplot(pyramid_depth, 2, pos)
             img = cv2.cvtColor(pyramids[-1 + (-1 * i)], cv2.COLOR_GRAY2RGB)
-            plt.imshow(img, interpolation='none')
+            cv2.imshow(img, interpolation='none')
             a.set_title("Image: %d" % (r + 1))
 
-    print "Find patch from template image"
-    print "Patch at top of pyramid (As seen on template '%d')" % pyramid_depth
+    #print "Find patch from template image"
+    #print "Patch at top of pyramid (As seen on template '%d')" % pyramid_depth
 
     #pyramid_pos = 4
     in_point = pyramid_points[pyramid_pos]
@@ -209,36 +306,67 @@ def klt_track(image,
     transform = [[cos(radians(angle)), -sin(radians(angle)), 0],
                  [sin(radians(angle)),  cos(radians(angle)), 0]]
 
-    out_point, template_tsfrm_patch = apply_affine_image_warp(in_patch, in_point, transform, energy_threshold)
-    dut_image_patch = get_patch(in_dut_image, out_point, patch_size)
+    out_point, xfrm_patch = apply_affine_image_warp(in_patch, in_point, transform, energy_threshold)
+    dut_patch = get_patch(in_dut_image, out_point, patch_size)
 
-    fig = plt.figure(figsize=(10, 15))
-    a = fig.add_subplot(1, 3, 1)
-    plt.imshow(in_patch, cmap="gray", interpolation='none')
-    a.set_title("Template Patch")
+    patch_width = PATCH_SIZE
+    patch_height = PATCH_SIZE
+    patch_scale = 100
 
-    a = fig.add_subplot(1, 3, 2)
-    plt.imshow(template_tsfrm_patch, cmap="gray", interpolation='none')
-    a.set_title("Template Patch Post Transform")
+    #in_patch.resize             ((patch_width * patch_scale, patch_height * patch_scale))
+    #xfrm_patch.resize ((patch_width * patch_scale, patch_height * patch_scale))
+    #dut_patch.resize      ((patch_width * patch_scale, patch_height * patch_scale))
 
-    a = fig.add_subplot(1, 3, 3)
-    plt.imshow(dut_image_patch, cmap="gray", interpolation='none')
-    a.set_title("DUT Patch")
+    in_patch_scale        = np.kron(in_patch,     np.ones((patch_scale, patch_scale)))
+    xfrm_patch_scale      = np.kron(xfrm_patch,   np.ones((patch_scale, patch_scale)))
+    dut_patch_scale       = np.kron(dut_patch,    np.ones((patch_scale, patch_scale)))
+
+    img_patches = np.zeros((patch_height * patch_scale, patch_width * patch_scale * 3), dtype=np.uint8)
+
+    for y in range(0, patch_scale * patch_height):
+        for x in range(0, patch_scale * patch_width):
+            img_patches[y][x + (patch_width * patch_scale * 0)] = in_patch_scale[y][x]
+            img_patches[y][x + (patch_width * patch_scale * 1)] = xfrm_patch_scale[y][x]
+            img_patches[y][x + (patch_width * patch_scale * 2)] = dut_patch_scale[y][x]
+
+    #img_patches = cv2.cvtColor(img_patches, cv2.CV_8UC1)
+    im_color = cv2.applyColorMap(img_patches, cv2.COLORMAP_JET)
+    #cv2.imshow("Main", img_patches)
+    cv2.imshow("Main", im_color)
+
+    #fig = cv2.figure(figsize=(10, 15))
+    #a = fig.add_subplot(1, 3, 1)
+    #cv2.imshow(in_patch, cmap="gray", interpolation='none')
+    #XXX: cv2.imshow("Main Window", in_patch)
+    #a.set_title("Template Patch")
+
+    #a = fig.add_subplot(1, 3, 2)
+    #cv2.imshow(xfrm_patch, cmap="gray", interpolation='none')
+    #XXX: cv2.imshow("Main Window", xfrm_patch)
+    #a.set_title("Template Patch Post Transform")
+
+    #a = fig.add_subplot(1, 3, 3)
+    #cv2.imshow(dut_patch, cmap="gray", interpolation='none')
+    #XXX: cv2.imshow("Main Window", dut_patch)
+    #a.set_title("DUT Patch")
 
     print ("Template Feature Point         (%d, %d) Template Original Patch:\n%s" %
         (in_point[0],  in_point[1],  str(in_patch)))
     print ("Template Transform Point Point (%d, %d) Template Transform Patch:\n%s" %
-        (out_point[0], out_point[1], str(template_tsfrm_patch)))
+        (out_point[0], out_point[1], str(xfrm_patch)))
     print ("DUT Image Point                (%d, %d) DUT Patch:\n%s" %
-        (out_point[0], out_point[1], str(dut_image_patch)))
+        (out_point[0], out_point[1], str(dut_patch)))
+
+    #error = find_patch_error(xfrm_patch, dut_patch)
+    #print ("Error: %d" % error)
 
 
 def update_klt(features, gray, prev_gray, image, feature_select, angle, pyramid_pos, energy_threshold, debug = False):
     print "Feature Count: %d" % len(features)
 
     if debug:
-        plt.imshow(image)
-        plt.title("All Features Found (Red is focused)")
+        cv2.imshow(image)
+        cv2.title("All Features Found (Red is focused)")
 
     for point in features:
         cv2.circle( image,
@@ -300,8 +428,8 @@ def main(argv):
                         help="Enable Debug Messages")
 
     parser.add_argument("--display",
-			            action="store_true",
-			            help="Display View")
+                                    action="store_true",
+                                    help="Display View")
 
 
     args = parser.parse_args()
@@ -330,11 +458,14 @@ def main(argv):
     #Track Features until we loose a few of them
     ret, image = cap.read()
 
-    gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    update_klt(features, gray, prev_gray, gimage, feature_select, angle, pyramid_pos, energy_threshold, args.debug)
+    gray = cv2.cvtColor(image,cv2. COLOR_BGR2GRAY)
+    while (True):
+        update_klt(features, gray, prev_gray, gimage, feature_select, angle, pyramid_pos, energy_threshold, args.debug)
 
-    if args.display:
-	    plt.show()
+        angle += 5
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            break
+
 
 if __name__ == "__main__":
     main(sys.argv)
