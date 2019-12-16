@@ -1,0 +1,12 @@
+To test this
+
+run:
+
+python ./configure.py
+
+echo "Create the shared object library and install it"
+./make_library.sh
+
+echo "Build the python module and install it"
+make
+make install

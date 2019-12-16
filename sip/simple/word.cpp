@@ -1,0 +1,23 @@
+// word.cpp
+
+#include <string.h>
+#include <iostream>
+#include <word.h>
+
+using namespace std;
+
+Word::Word(const char *w)
+{
+        the_word = w;
+}
+
+char* Word::reverse() const
+{
+        int len = strlen(the_word);
+        char *str = new char[len+1];
+        for(int i = len-1;i >= 0 ;i--) {
+                str[len-1-i] = the_word[i];
+        }
+        str[len+1]='\0';
+        return str;
+}
