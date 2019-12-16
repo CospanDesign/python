@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # Copyright (c) 2015 Dave McCoy (dave.mccoy@cospandesign.com)
 #
@@ -121,11 +121,11 @@ def main(argv):
                         help="Enable Debug Messages")
 
     args = parser.parse_args()
-    print "Running Script: %s" % NAME
+    print ("Running Script: %s" % NAME)
 
 
     if args.debug:
-        print "test: %s" % str(args.test[0])
+        print ("test: %s" % str(args.test[0]))
 
     app = MyApp()
     app.run()
