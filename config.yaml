@@ -1,0 +1,12 @@
+test_str: string
+test_int: 10
+test_float: 3.14
+test_list:
+    - one
+    - two
+    - three
+
+test_dict:
+    key1: "val1"
+    key2: "val2"
+    key3: "val3"
