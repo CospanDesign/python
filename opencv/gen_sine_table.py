@@ -20,7 +20,6 @@ import sys
 import os
 import argparse
 import numpy as np
-import cv2
 
 #sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
 
@@ -36,23 +35,6 @@ EPILOG = "\n" \
          "\tSomething\n" \
          "\n"
 
-DEFAULT_PATH="/home/cospan/sandbox/output.mp4"
-
-def play_video(path):
-    cap = cv2.VideoCapture(path)
-    while (True):
-        ret, frame = cap.read()
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-        cap.release()
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
 def main(argv):
     #Parse out the commandline arguments
     parser = argparse.ArgumentParser(
@@ -61,9 +43,9 @@ def main(argv):
         epilog=EPILOG
     )
 
-    parser.add_argument("-p", "--path",
+    parser.add_argument("-t", "--test",
                         nargs=1,
-                        default=[DEFAULT_PATH])
+                        default=["something"])
 
     parser.add_argument("-d", "--debug",
                         action="store_true",
@@ -72,12 +54,21 @@ def main(argv):
     args = parser.parse_args()
     print ("Running Script: %s" % NAME)
 
-    path = args.path[0]
 
     if args.debug:
-        print ("path: %s" % path)
+        print ("test: %s" % str(args.test[0]))
 
-    play_video(path)
+    sine_table = []
+    for i in range(0, 180):
+        j = i / 2
+        #print ("%f" % (j))
+        k = np.deg2rad(j)
+        sine_table.append(np.sin(k))
+
+    with open("sine_table_float.txt", 'w') as f:
+        for d in sine_table:
+            f.write("%f\n" % d)
+
 
 if __name__ == "__main__":
     main(sys.argv)
